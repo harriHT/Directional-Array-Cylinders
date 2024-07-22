@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array of Two Cylindrical Detectors for Localization of Radioactive Sources</title>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css">
+    <link rel="icon" href="data:,">
+    <style>
+        .center-content {
+            text-align: center;
+            margin: 0 auto;
+        }
+        .center-content img {
+            display: block;
+            margin: 0 auto;
+        }
+        .center-content p {
+            font-size: 1.2em;
+        }
+        .bold-blue {
+            font-weight: bold;
+            color: blue;
+        }
+        .input-container {
+            margin-top: 1em;
+        }
+        .input-container label, .input-container input {
+            display: inline-block;
+            margin: 0.5em 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="center-content">
+        <h1 class="bold-blue">Array of Two Cylindrical Detectors for Localization of Radioactive Sources</h1>
+        <img src="layout.png" alt="2x1 cylindrical array and a shield (W or Pb) between the detectors" width="600">
+        <p class="bold-blue">The count ratio between the back and front detectors reveals the direction of the source.</p>
+        <p>Enter the coefficients for the model:</p>
+        <div class="input-container">
+            <label for="r-input">r: </label>
+            <input type="number" id="r-input" placeholder="Enter r" step="any" value="3.8">
+            <label for="w-input">w: </label>
+            <input type="number" id="w-input" placeholder="Enter w" step="any" value="1.2">
+            <label for="h-input">h: </label>
+            <input type="number" id="h-input" placeholder="Enter h" step="any" value="1.2">
+        </div>
+        <button id="plot-button">Plot Model</button>
+    </div>
+    <div id="plot" class="center-content"></div>
+
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <py-config>
+        packages = ["matplotlib"]
+    </py-config>
+    <py-script>
+        import micropip
+        import asyncio
+        from js import console, document, fetch
+        from pyodide.ffi import create_proxy
+        import matplotlib.pyplot as plt
+
+        async def load_script(url):
+            response = await fetch(url)
+            if not response.ok:
+                raise RuntimeError(f"Failed to fetch {url}: {response.status}")
+            script_content = await response.text()
+            exec(script_content, globals())
+
+        async def main():
+            await micropip.install("matplotlib")
+            await load_script('2x1_cylindricalModel.py')
+            console.log("2x1_cylindricalModel module loaded.")
+            parameterPlotting = globals()['parameterPlotting']
+
+            console.log("Setting up plot function...")
+
+            def plot_model(event=None):
+                console.log("Button clicked.")
+                try:
+                    r = float(document.getElementById("r-input").value)
+                    w = float(document.getElementById("w-input").value)
+                    h = float(document.getElementById("h-input").value)
+
+                    console.log(f"Values entered: r={r}, w={w}, h={h}")
+
+                    plot_div = document.getElementById("plot")
+                    plot_div.innerHTML = ""
+                    fig = parameterPlotting(r, w, h)
+                    display(fig, target="plot")
+                except Exception as e:
+                    console.error(f"Error plotting model: {e}")
+
+            plot_proxy = create_proxy(plot_model)
+            button = document.getElementById("plot-button")
+            button.addEventListener("click", plot_proxy)
+
+            console.log("Setup complete.")
+
+            # Plot the model with default values when the page loads
+            plot_model()
+
+        asyncio.ensure_future(main())
+    </py-script>
+</body>
+</html>
