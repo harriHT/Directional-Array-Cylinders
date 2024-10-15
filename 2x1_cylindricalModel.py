@@ -1,5 +1,5 @@
 # Geometric model for cylindrical detectors in 2x1 array
-# (C) Harri Toivonen, HT Nuclear Oy, 28 May 2024
+# (C) Harri Toivonen, HT Nuclear Oy, 28 May 2024 and 15 Oct 2024
 # Documentation: Array of two spectrometers for source directional estimation, HT 28 May 2024
 
 def parameterPlotting(r, w, h):
