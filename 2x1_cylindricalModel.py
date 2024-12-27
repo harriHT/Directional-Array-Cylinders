@@ -1,6 +1,6 @@
 # Geometric model for cylindrical detectors in 2x1 array
-# (C) Harri Toivonen, HT Nuclear Oy, 28 May 2024 and 15 Oct 2024
-# Documentation: Array of two spectrometers for source directional estimation, HT 28 May 2024
+# (C) Harri Toivonen, HT Nuclear Oy, 27 Dec 2024
+# Documentation: Array of two spectrometers for source directional estimation, HT 28 May 2024 and 15 Oct 2024
 
 def parameterPlotting(r, w, h):
     import matplotlib.pyplot as plt
@@ -8,6 +8,8 @@ def parameterPlotting(r, w, h):
     import numpy as np
 
     def cylindricalModel(r, w, h, theta):
+        #y_theoretical = ((r + w) * np.cos(theta) - h * np.sin(theta)) / ( r * np.cos(theta) + r * np.sin(theta))
+
         y_theoretical = 0.5 * (1 +(1 + w/r) * np.cos(theta) - (1 +h/r) * np.sin(theta))
         for i in range(len(y_theoretical)):
             if y_theoretical[i] > 1:
@@ -24,7 +26,7 @@ def parameterPlotting(r, w, h):
 
     figDirection = plt.figure(num='Cylindrical geometry', figsize=[11, 9])
     figureText = 'r = radius; w = gap between the detectors; h = collimator'
-    figDirection.suptitle(figureText + '\nGeometric model: R = 1/2 * [(1 +(1 + w/r) * cos(theta) - (1 +h/r) * sin(theta)]')
+    figDirection.suptitle(figureText + '\nGeometric model: R = 1/2 * [1 +(1 + w/r) * cos(theta) - (1 +h/r) * sin(theta)]\n Function not valid on the insensitive regions')
     ax1 = plt.subplot(1, 1, 1)
 
     y_ideal = cylindricalModel(r, 0, 0, theta)
@@ -52,4 +54,6 @@ if __name__ == '__main__':
     w = 1.2 
     h = 1.2
 
-    parameterPlotting(r, w, h)
+    fig = parameterPlotting(r, w, h)
+    fig.show()
+  
